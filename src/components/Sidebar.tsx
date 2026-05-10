@@ -1,11 +1,12 @@
 import React from 'react';
-import { RefreshCw, Sun, Palette } from 'lucide-react';
+import { RefreshCw, Sun, Palette, X } from 'lucide-react';
+import { LightState, LightType } from '../types';
 
 interface SidebarProps {
   pitch: number; setPitch: (v: number) => void;
   yaw: number; setYaw: (v: number) => void;
-  lightAzimuth: number; setLightAzimuth: (v: number) => void;
-  lightElevation: number; setLightElevation: (v: number) => void;
+  lights: LightState[]; setLights: (v: LightState[]) => void;
+  selectedLightId: string | null; setSelectedLightId: (v: string | null) => void;
   fidelity: 'LOW' | 'MID' | 'FULL'; setFidelity: (v: 'LOW' | 'MID' | 'FULL') => void;
   wireframe: boolean; setWireframe: (v: boolean) => void;
   guides: boolean; setGuides: (v: boolean) => void;
@@ -14,7 +15,6 @@ interface SidebarProps {
   materialColor: string; setMaterialColor: (v: string) => void;
   roughness: number; setRoughness: (v: number) => void;
   metalness: number; setMetalness: (v: number) => void;
-  lightIntensity: number; setLightIntensity: (v: number) => void;
   ambientIntensity: number; setAmbientIntensity: (v: number) => void;
   showLights: boolean; setShowLights: (v: boolean) => void;
   fixLightToCamera: boolean; setFixLightToCamera: (v: boolean) => void;
@@ -23,8 +23,8 @@ interface SidebarProps {
 export default function Sidebar({
   pitch, setPitch,
   yaw, setYaw,
-  lightAzimuth, setLightAzimuth,
-  lightElevation, setLightElevation,
+  lights, setLights,
+  selectedLightId, setSelectedLightId,
   fidelity, setFidelity,
   wireframe, setWireframe,
   guides, setGuides,
@@ -33,11 +33,16 @@ export default function Sidebar({
   materialColor, setMaterialColor,
   roughness, setRoughness,
   metalness, setMetalness,
-  lightIntensity, setLightIntensity,
   ambientIntensity, setAmbientIntensity,
   showLights, setShowLights,
   fixLightToCamera, setFixLightToCamera
 }: SidebarProps) {
+  
+  const selectedLight = lights.find(l => l.id === selectedLightId);
+
+  const updateLight = (id: string, updates: Partial<LightState>) => {
+    setLights(lights.map(l => l.id === id ? { ...l, ...updates } : l));
+  };
 
   return (
     <aside className="w-[320px] bg-surface-dim border-r border-border flex flex-col h-full z-20 overflow-y-auto relative backdrop-blur-md">
@@ -85,86 +90,149 @@ export default function Sidebar({
           </div>
 
           <div className="space-y-4">
-            {/* Presets */}
-            <div className="space-y-2">
-              <div className="flex justify-between items-center text-xs font-normal">
-                <span>Presets</span>
-              </div>
-              <div className="grid grid-cols-3 gap-2">
-                <button 
-                  onClick={() => { setLightAzimuth(0); setLightElevation(0); }}
-                  className="py-1.5 bg-surface border border-border text-[9px] text-text hover:text-accent hover:border-accent rounded-sm transition-colors text-center uppercase tracking-widest"
-                >Front</button>
-                <button 
-                  onClick={() => { setLightAzimuth(0); setLightElevation(60); }}
-                  className="py-1.5 bg-surface border border-border text-[9px] text-text hover:text-accent hover:border-accent rounded-sm transition-colors text-center uppercase tracking-widest"
-                >Top</button>
-                <button 
-                  onClick={() => { setLightAzimuth(45); setLightElevation(30); }}
-                  className="py-1.5 bg-surface border border-border text-[9px] text-text hover:text-accent hover:border-accent rounded-sm transition-colors text-center uppercase tracking-widest"
-                >Rembrandt</button>
-                <button 
-                  onClick={() => { setLightAzimuth(-90); setLightElevation(10); }}
-                  className="py-1.5 bg-surface border border-border text-[9px] text-text hover:text-accent hover:border-accent rounded-sm transition-colors text-center uppercase tracking-widest"
-                >Side L</button>
-                <button 
-                  onClick={() => { setLightAzimuth(90); setLightElevation(10); }}
-                  className="py-1.5 bg-surface border border-border text-[9px] text-text hover:text-accent hover:border-accent rounded-sm transition-colors text-center uppercase tracking-widest"
-                >Side R</button>
-                <button 
-                  onClick={() => { setLightAzimuth(0); setLightElevation(-45); }}
-                  className="py-1.5 bg-surface border border-border text-[9px] text-text hover:text-accent hover:border-accent rounded-sm transition-colors text-center uppercase tracking-widest"
-                >Under</button>
-              </div>
-            </div>
+            
+            {selectedLightId && selectedLight ? (
+              <div className="space-y-4 bg-surface rounded-sm border border-border p-3 mt-2">
+                <div className="flex justify-between items-center mb-2">
+                  <span className="text-xs font-semibold">{selectedLight.name}</span>
+                  <button onClick={() => setSelectedLightId(null)} className="text-text-dim hover:text-text cursor-pointer">
+                    <X size={14} />
+                  </button>
+                </div>
+                
+                <div className="space-y-2">
+                  <div className="flex justify-between items-center text-xs font-normal">
+                    <span>Intensity</span>
+                    <span className="text-accent bg-bg/50 px-2 py-0.5 rounded-sm border border-border font-mono">{selectedLight.intensity.toFixed(2)}</span>
+                  </div>
+                  <input 
+                    type="range" min="0" max="10" step="0.1" value={selectedLight.intensity} 
+                    onChange={(e) => updateLight(selectedLight.id, { intensity: Number(e.target.value) })}
+                    className="w-full h-[2px] bg-border rounded-none appearance-none cursor-pointer outline-none accent-accent"
+                  />
+                </div>
+                
+                <div className="space-y-2">
+                  <div className="flex justify-between items-center text-xs font-normal">
+                    <span>Azimuth</span>
+                    <span className="text-accent bg-bg/50 px-2 py-0.5 rounded-sm border border-border font-mono">{selectedLight.azimuth.toFixed(1)}°</span>
+                  </div>
+                  <input 
+                    type="range" min="-180" max="180" step="1" value={selectedLight.azimuth} 
+                    onChange={(e) => updateLight(selectedLight.id, { azimuth: Number(e.target.value) })}
+                    className="w-full h-[2px] bg-border rounded-none appearance-none cursor-pointer outline-none accent-accent"
+                  />
+                </div>
 
-            <div className="space-y-2">
-              <div className="flex justify-between items-center text-xs font-normal">
-                <span>Azimuth (Y)</span>
-                <span className="text-accent bg-surface/50 px-2 py-0.5 rounded-sm border border-border font-mono">{lightAzimuth}°</span>
-              </div>
-              <input 
-                type="range" min="-180" max="180" step="1" value={lightAzimuth} 
-                onChange={(e) => setLightAzimuth(Number(e.target.value))}
-                className="w-full h-[2px] bg-border rounded-none appearance-none cursor-pointer outline-none accent-accent"
-              />
-            </div>
+                <div className="space-y-2">
+                  <div className="flex justify-between items-center text-xs font-normal">
+                    <span>Elevation</span>
+                    <span className="text-accent bg-bg/50 px-2 py-0.5 rounded-sm border border-border font-mono">{selectedLight.elevation.toFixed(1)}°</span>
+                  </div>
+                  <input 
+                    type="range" min="-90" max="90" step="1" value={selectedLight.elevation} 
+                    onChange={(e) => updateLight(selectedLight.id, { elevation: Number(e.target.value) })}
+                    className="w-full h-[2px] bg-border rounded-none appearance-none cursor-pointer outline-none accent-accent"
+                  />
+                </div>
+                
+                {selectedLight.type === 'point' && (
+                  <div className="space-y-2">
+                    <div className="flex justify-between items-center text-xs font-normal">
+                      <span>Distance</span>
+                      <span className="text-accent bg-bg/50 px-2 py-0.5 rounded-sm border border-border font-mono">{selectedLight.distance.toFixed(1)}</span>
+                    </div>
+                    <input 
+                      type="range" min="1" max="15" step="0.1" value={selectedLight.distance} 
+                      onChange={(e) => updateLight(selectedLight.id, { distance: Number(e.target.value) })}
+                      className="w-full h-[2px] bg-border rounded-none appearance-none cursor-pointer outline-none accent-accent"
+                    />
+                  </div>
+                )}
+                
+                <div className="space-y-2">
+                  <div className="flex justify-between items-center text-xs font-normal">
+                    <span>Color</span>
+                  </div>
+                  <div className="flex gap-2">
+                    <div className="relative w-6 h-6 rounded-full border border-border overflow-hidden cursor-pointer" style={{ backgroundColor: selectedLight.color }}>
+                      <input 
+                        type="color" 
+                        value={selectedLight.color} 
+                        onChange={e => updateLight(selectedLight.id, { color: e.target.value })} 
+                        className="absolute w-[200%] h-[200%] -top-1/2 -left-1/2 p-0 border-0 cursor-pointer" 
+                      />
+                    </div>
+                  </div>
+                </div>
 
-            <div className="space-y-2">
-              <div className="flex justify-between items-center text-xs font-normal">
-                <span>Elevation (X)</span>
-                <span className="text-accent bg-surface/50 px-2 py-0.5 rounded-sm border border-border font-mono">{lightElevation}°</span>
               </div>
-              <input 
-                type="range" min="-90" max="90" step="1" value={lightElevation} 
-                onChange={(e) => setLightElevation(Number(e.target.value))}
-                className="w-full h-[2px] bg-border rounded-none appearance-none cursor-pointer outline-none accent-accent"
-              />
-            </div>
+            ) : (
+              <>
+                {/* Global Setup */}
+                <div className="space-y-2">
+                  <div className="flex justify-between items-center text-xs font-normal">
+                    <span>Select Light</span>
+                  </div>
+                  <div className="grid grid-cols-1 gap-2">
+                    {lights.map(light => (
+                      <button 
+                         key={light.id}
+                         onClick={() => setSelectedLightId(light.id)}
+                         className="flex items-center gap-2 py-2 px-3 bg-surface border border-border text-xs text-text hover:text-accent hover:border-accent rounded-sm transition-colors text-left"
+                      >
+                         <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: light.color }} />
+                         {light.name}
+                      </button>
+                    ))}
+                  </div>
+                </div>
 
-            <div className="space-y-2">
-              <div className="flex justify-between items-center text-xs font-normal">
-                <span>Main Intensity</span>
-                <span className="text-accent bg-surface/50 px-2 py-0.5 rounded-sm border border-border font-mono">{lightIntensity.toFixed(1)}</span>
-              </div>
-              <input 
-                type="range" min="0" max="5" step="0.1" value={lightIntensity} 
-                onChange={(e) => setLightIntensity(Number(e.target.value))}
-                className="w-full h-[2px] bg-border rounded-none appearance-none cursor-pointer outline-none accent-accent"
-              />
-            </div>
+                <div className="space-y-2 mt-4">
+                  <div className="flex justify-between items-center text-xs font-normal">
+                    <span>Presets (Main Light)</span>
+                  </div>
+                  <div className="grid grid-cols-3 gap-2">
+                    <button 
+                      onClick={() => updateLight('main', { azimuth: 0, elevation: 0 })}
+                      className="py-1.5 bg-surface border border-border text-[9px] text-text hover:text-accent hover:border-accent rounded-sm transition-colors text-center uppercase tracking-widest"
+                    >Front</button>
+                    <button 
+                      onClick={() => updateLight('main', { azimuth: 0, elevation: 60 })}
+                      className="py-1.5 bg-surface border border-border text-[9px] text-text hover:text-accent hover:border-accent rounded-sm transition-colors text-center uppercase tracking-widest"
+                    >Top</button>
+                    <button 
+                      onClick={() => updateLight('main', { azimuth: 45, elevation: 30 })}
+                      className="py-1.5 bg-surface border border-border text-[9px] text-text hover:text-accent hover:border-accent rounded-sm transition-colors text-center uppercase tracking-widest"
+                    >Rembrandt</button>
+                    <button 
+                      onClick={() => updateLight('main', { azimuth: -90, elevation: 10 })}
+                      className="py-1.5 bg-surface border border-border text-[9px] text-text hover:text-accent hover:border-accent rounded-sm transition-colors text-center uppercase tracking-widest"
+                    >Side L</button>
+                    <button 
+                      onClick={() => updateLight('main', { azimuth: 90, elevation: 10 })}
+                      className="py-1.5 bg-surface border border-border text-[9px] text-text hover:text-accent hover:border-accent rounded-sm transition-colors text-center uppercase tracking-widest"
+                    >Side R</button>
+                    <button 
+                      onClick={() => updateLight('main', { azimuth: 0, elevation: -45 })}
+                      className="py-1.5 bg-surface border border-border text-[9px] text-text hover:text-accent hover:border-accent rounded-sm transition-colors text-center uppercase tracking-widest"
+                    >Under</button>
+                  </div>
+                </div>
 
-            <div className="space-y-2">
-              <div className="flex justify-between items-center text-xs font-normal">
-                <span>Fill Light (Ambient)</span>
-                <span className="text-accent bg-surface/50 px-2 py-0.5 rounded-sm border border-border font-mono">{ambientIntensity.toFixed(1)}</span>
-              </div>
-              <input 
-                type="range" min="0" max="3" step="0.1" value={ambientIntensity} 
-                onChange={(e) => setAmbientIntensity(Number(e.target.value))}
-                className="w-full h-[2px] bg-border rounded-none appearance-none cursor-pointer outline-none accent-accent"
-              />
-            </div>
+                <div className="space-y-2 mt-4">
+                  <div className="flex justify-between items-center text-xs font-normal">
+                    <span>Fill Light (Ambient)</span>
+                    <span className="text-accent bg-surface/50 px-2 py-0.5 rounded-sm border border-border font-mono">{ambientIntensity.toFixed(1)}</span>
+                  </div>
+                  <input 
+                    type="range" min="0" max="3" step="0.1" value={ambientIntensity} 
+                    onChange={(e) => setAmbientIntensity(Number(e.target.value))}
+                    className="w-full h-[2px] bg-border rounded-none appearance-none cursor-pointer outline-none accent-accent"
+                  />
+                </div>
+              </>
+            )}
 
             {/* Light Option Toggles */}
             <div className="flex justify-between items-center pt-2">

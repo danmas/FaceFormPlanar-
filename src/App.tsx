@@ -7,12 +7,17 @@ import React, { useState } from 'react';
 import Sidebar from './components/Sidebar';
 import HeadCanvas from './components/HeadCanvas';
 import { RotateCw, Sparkles, HelpCircle } from 'lucide-react';
+import { LightState } from './types';
 
 export default function App() {
   const [pitch, setPitch] = useState(0);
   const [yaw, setYaw] = useState(0);
-  const [lightAzimuth, setLightAzimuth] = useState(45);
-  const [lightElevation, setLightElevation] = useState(30);
+  const [lights, setLights] = useState<LightState[]>([
+    { id: 'main', type: 'directional', name: 'Main Light', color: '#ffffff', intensity: 2, azimuth: 45, elevation: 30, distance: 5 },
+    { id: 'fill', type: 'point', name: 'Fill Light', color: '#d4af37', intensity: 1, azimuth: -135, elevation: -25, distance: 4.6 },
+    { id: 'rim', type: 'point', name: 'Rim Light', color: '#808080', intensity: 0.5, azimuth: 135, elevation: 35, distance: 5.1 },
+  ]);
+  const [selectedLightId, setSelectedLightId] = useState<string | null>(null);
   const [fidelity, setFidelity] = useState<'LOW' | 'MID' | 'FULL'>('LOW');
   const [wireframe, setWireframe] = useState(false);
   const [guides, setGuides] = useState(true);
@@ -21,7 +26,6 @@ export default function App() {
   const [materialColor, setMaterialColor] = useState('#1c1c1f');
   const [roughness, setRoughness] = useState(0.6);
   const [metalness, setMetalness] = useState(0.1);
-  const [lightIntensity, setLightIntensity] = useState(2);
   const [ambientIntensity, setAmbientIntensity] = useState(0.8);
   const [showLights, setShowLights] = useState(true);
   const [fixLightToCamera, setFixLightToCamera] = useState(true);
@@ -29,8 +33,12 @@ export default function App() {
   const resetStage = () => {
     setPitch(0);
     setYaw(0);
-    setLightAzimuth(45);
-    setLightElevation(30);
+    setLights([
+      { id: 'main', type: 'directional', name: 'Main Light', color: '#ffffff', intensity: 2, azimuth: 45, elevation: 30, distance: 5 },
+      { id: 'fill', type: 'point', name: 'Fill Light', color: '#d4af37', intensity: 1, azimuth: -135, elevation: -25, distance: 4.6 },
+      { id: 'rim', type: 'point', name: 'Rim Light', color: '#808080', intensity: 0.5, azimuth: 135, elevation: 35, distance: 5.1 },
+    ]);
+    setSelectedLightId(null);
     setFidelity('LOW');
     setWireframe(false);
     setGuides(true);
@@ -39,7 +47,6 @@ export default function App() {
     setMaterialColor('#1c1c1f');
     setRoughness(0.6);
     setMetalness(0.1);
-    setLightIntensity(2);
     setAmbientIntensity(0.8);
     setShowLights(true);
     setFixLightToCamera(true);
@@ -60,8 +67,8 @@ export default function App() {
       <Sidebar 
         pitch={pitch} setPitch={setPitch}
         yaw={yaw} setYaw={setYaw}
-        lightAzimuth={lightAzimuth} setLightAzimuth={setLightAzimuth}
-        lightElevation={lightElevation} setLightElevation={setLightElevation}
+        lights={lights} setLights={setLights}
+        selectedLightId={selectedLightId} setSelectedLightId={setSelectedLightId}
         fidelity={fidelity} setFidelity={setFidelity}
         wireframe={wireframe} setWireframe={setWireframe}
         guides={guides} setGuides={setGuides}
@@ -70,7 +77,6 @@ export default function App() {
         materialColor={materialColor} setMaterialColor={setMaterialColor}
         roughness={roughness} setRoughness={setRoughness}
         metalness={metalness} setMetalness={setMetalness}
-        lightIntensity={lightIntensity} setLightIntensity={setLightIntensity}
         ambientIntensity={ambientIntensity} setAmbientIntensity={setAmbientIntensity}
         showLights={showLights} setShowLights={setShowLights}
         fixLightToCamera={fixLightToCamera} setFixLightToCamera={setFixLightToCamera}
@@ -104,7 +110,8 @@ export default function App() {
         <div className="absolute inset-0 z-0 bg-[radial-gradient(circle_at_center,_#1c1c1f_0%,_#0a0a0a_100%)]">
            <HeadCanvas 
              pitch={pitch} yaw={yaw}
-             lightAzimuth={lightAzimuth} lightElevation={lightElevation}
+             lights={lights} setLights={setLights}
+             selectedLightId={selectedLightId} setSelectedLightId={setSelectedLightId}
              fidelity={fidelity}
              wireframe={wireframe}
              guides={guides}
@@ -114,7 +121,6 @@ export default function App() {
              materialColor={materialColor}
              roughness={roughness}
              metalness={metalness}
-             lightIntensity={lightIntensity}
              ambientIntensity={ambientIntensity}
              showLights={showLights}
              fixLightToCamera={fixLightToCamera}

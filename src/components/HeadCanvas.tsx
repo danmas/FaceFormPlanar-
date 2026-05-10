@@ -3,11 +3,15 @@ import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { OrbitControls, ContactShadows, Environment, useGLTF } from '@react-three/drei';
 import * as THREE from 'three';
 
+import { LightState } from '../types';
+
 interface HeadCanvasProps {
   pitch: number;
   yaw: number;
-  lightAzimuth: number;
-  lightElevation: number;
+  lights: LightState[];
+  setLights: (v: LightState[]) => void;
+  selectedLightId: string | null;
+  setSelectedLightId: (v: string | null) => void;
   fidelity: 'LOW' | 'MID' | 'FULL';
   wireframe: boolean;
   guides: boolean;
@@ -17,7 +21,6 @@ interface HeadCanvasProps {
   materialColor: string;
   roughness: number;
   metalness: number;
-  lightIntensity: number;
   ambientIntensity: number;
   showLights: boolean;
   fixLightToCamera: boolean;
@@ -222,18 +225,10 @@ function CustomModel({ url, wireframe, color, roughness, metalness }: { url: str
   return <primitive object={scene} scale={[1.5, 1.5, 1.5]} position={[0, -0.5, 0]} />;
 }
 
-function Scene({ pitch, yaw, lightAzimuth, lightElevation, fidelity, wireframe, guides, customModelUrl, setPitch, setYaw, materialColor, roughness, metalness, lightIntensity, ambientIntensity, showLights, fixLightToCamera }: HeadCanvasProps) {
+function Scene({ pitch, yaw, lights, setLights, selectedLightId, setSelectedLightId, fidelity, wireframe, guides, customModelUrl, setPitch, setYaw, materialColor, roughness, metalness, ambientIntensity, showLights, fixLightToCamera }: HeadCanvasProps) {
   const groupRef = useRef<THREE.Group>(null);
   const lightsGroupRef = useRef<THREE.Group>(null);
   const controlsRef = useRef<any>(null);
-
-  // Convert Azimuth and Elevation to Cartesian
-  const radius = 5;
-  const phi = THREE.MathUtils.degToRad(lightElevation);
-  const theta = THREE.MathUtils.degToRad(lightAzimuth);
-  const lx = radius * Math.cos(phi) * Math.sin(theta);
-  const ly = radius * Math.sin(phi);
-  const lz = radius * Math.cos(phi) * Math.cos(theta);
 
   // Sync external state (sliders) to group rotation
   useEffect(() => {
@@ -265,33 +260,59 @@ function Scene({ pitch, yaw, lightAzimuth, lightElevation, fidelity, wireframe, 
     <>
       <group ref={lightsGroupRef}>
         <ambientLight intensity={ambientIntensity} />
-        <directionalLight 
-          position={[lx, ly, lz]} 
-          intensity={lightIntensity} 
-          color="#ffffff"
-          castShadow 
-          shadow-mapSize-width={1024} 
-          shadow-mapSize-height={1024} 
-        />
-        <pointLight position={[-3, -2, -3]} color="#d4af37" intensity={1} />
-        <pointLight position={[3, 3, -3]} color="#808080" intensity={0.5} />
         
-        {showLights && (
-          <>
-            <mesh position={[lx, ly, lz]}>
-              <sphereGeometry args={[0.2, 16, 16]} />
-              <meshBasicMaterial color="#ffffff" transparent opacity={0.9} />
-            </mesh>
-            <mesh position={[-3, -2, -3]}>
-              <sphereGeometry args={[0.15, 16, 16]} />
-              <meshBasicMaterial color="#d4af37" transparent opacity={0.8} />
-            </mesh>
-            <mesh position={[3, 3, -3]}>
-              <sphereGeometry args={[0.15, 16, 16]} />
-              <meshBasicMaterial color="#808080" transparent opacity={0.8} />
-            </mesh>
-          </>
-        )}
+        {lights.map(light => {
+          const radius = light.distance;
+          const phi = THREE.MathUtils.degToRad(light.elevation);
+          const theta = THREE.MathUtils.degToRad(light.azimuth);
+          const lx = radius * Math.cos(phi) * Math.sin(theta);
+          const ly = radius * Math.sin(phi);
+          const lz = radius * Math.cos(phi) * Math.cos(theta);
+          
+          const isSelected = selectedLightId === light.id;
+
+          return (
+            <group key={light.id}>
+              {light.type === 'directional' ? (
+                <directionalLight 
+                  position={[lx, ly, lz]} 
+                  intensity={light.intensity} 
+                  color={light.color}
+                  castShadow 
+                  shadow-mapSize-width={1024} 
+                  shadow-mapSize-height={1024} 
+                />
+              ) : (
+                <pointLight 
+                  position={[lx, ly, lz]} 
+                  color={light.color} 
+                  intensity={light.intensity} 
+                  distance={light.distance * 2} // let decay happen
+                />
+              )}
+              
+              {showLights && (
+                <mesh 
+                  position={[lx, ly, lz]} 
+                  onClick={(e) => { e.stopPropagation(); setSelectedLightId(light.id); }}
+                  onPointerOver={(e) => { document.body.style.cursor = 'pointer'; }}
+                  onPointerOut={(e) => { document.body.style.cursor = 'auto'; }}
+                >
+                  <sphereGeometry args={[isSelected ? 0.25 : 0.15, 16, 16]} />
+                  <meshBasicMaterial 
+                    color={light.color} 
+                    transparent 
+                    opacity={isSelected ? 1 : 0.7} 
+                    wireframe={isSelected}
+                  />
+                  {isSelected && (
+                    <pointLight color={light.color} intensity={0.5} distance={1} /> 
+                  )}
+                </mesh>
+              )}
+            </group>
+          );
+        })}
       </group>
 
       <group ref={groupRef}>
@@ -316,7 +337,7 @@ function Scene({ pitch, yaw, lightAzimuth, lightElevation, fidelity, wireframe, 
         enablePan={false}
         enableZoom={true}
         minDistance={3}
-        maxDistance={10}
+        maxDistance={20}
       />
     </>
   );
@@ -324,7 +345,7 @@ function Scene({ pitch, yaw, lightAzimuth, lightElevation, fidelity, wireframe, 
 
 export default function HeadCanvas(props: HeadCanvasProps) {
   return (
-    <Canvas shadows camera={{ position: [0, 1, 6], fov: 45 }}>
+    <Canvas shadows camera={{ position: [0, 1, 6], fov: 45 }} onPointerMissed={() => props.setSelectedLightId(null)}>
       <Scene {...props} />
     </Canvas>
   );
