@@ -21,6 +21,8 @@ export default function App() {
   const [materialColor, setMaterialColor] = useState('#1c1c1f');
   const [roughness, setRoughness] = useState(0.6);
   const [metalness, setMetalness] = useState(0.1);
+  const [lightIntensity, setLightIntensity] = useState(2);
+  const [ambientIntensity, setAmbientIntensity] = useState(0.8);
 
   const resetStage = () => {
     setPitch(0);
@@ -35,6 +37,8 @@ export default function App() {
     setMaterialColor('#1c1c1f');
     setRoughness(0.6);
     setMetalness(0.1);
+    setLightIntensity(2);
+    setAmbientIntensity(0.8);
   };
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -62,6 +66,8 @@ export default function App() {
         materialColor={materialColor} setMaterialColor={setMaterialColor}
         roughness={roughness} setRoughness={setRoughness}
         metalness={metalness} setMetalness={setMetalness}
+        lightIntensity={lightIntensity} setLightIntensity={setLightIntensity}
+        ambientIntensity={ambientIntensity} setAmbientIntensity={setAmbientIntensity}
       />
 
       {/* Main Content Area */}
@@ -102,6 +108,8 @@ export default function App() {
              materialColor={materialColor}
              roughness={roughness}
              metalness={metalness}
+             lightIntensity={lightIntensity}
+             ambientIntensity={ambientIntensity}
            />
         </div>
 

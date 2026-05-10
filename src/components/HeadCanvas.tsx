@@ -17,6 +17,8 @@ interface HeadCanvasProps {
   materialColor: string;
   roughness: number;
   metalness: number;
+  lightIntensity: number;
+  ambientIntensity: number;
 }
 
 function LowFidelityHead({ wireframe, guides, color, roughness, metalness }: { wireframe: boolean, guides: boolean, color: string, roughness: number, metalness: number }) {
@@ -218,7 +220,7 @@ function CustomModel({ url, wireframe, color, roughness, metalness }: { url: str
   return <primitive object={scene} scale={[1.5, 1.5, 1.5]} position={[0, -0.5, 0]} />;
 }
 
-function Scene({ pitch, yaw, lightX, lightY, fidelity, wireframe, guides, customModelUrl, setPitch, setYaw, materialColor, roughness, metalness }: HeadCanvasProps) {
+function Scene({ pitch, yaw, lightX, lightY, fidelity, wireframe, guides, customModelUrl, setPitch, setYaw, materialColor, roughness, metalness, lightIntensity, ambientIntensity }: HeadCanvasProps) {
   const groupRef = useRef<THREE.Group>(null);
   const controlsRef = useRef<any>(null);
 
@@ -238,10 +240,10 @@ function Scene({ pitch, yaw, lightX, lightY, fidelity, wireframe, guides, custom
 
   return (
     <>
-      <ambientLight intensity={0.8} />
+      <ambientLight intensity={ambientIntensity} />
       <directionalLight 
         position={[lightX, lightY, 5]} 
-        intensity={2} 
+        intensity={lightIntensity} 
         color="#ffffff"
         castShadow 
         shadow-mapSize-width={1024} 

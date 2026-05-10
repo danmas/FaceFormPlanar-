@@ -14,6 +14,8 @@ interface SidebarProps {
   materialColor: string; setMaterialColor: (v: string) => void;
   roughness: number; setRoughness: (v: number) => void;
   metalness: number; setMetalness: (v: number) => void;
+  lightIntensity: number; setLightIntensity: (v: number) => void;
+  ambientIntensity: number; setAmbientIntensity: (v: number) => void;
 }
 
 export default function Sidebar({
@@ -28,7 +30,9 @@ export default function Sidebar({
   handleFileUpload,
   materialColor, setMaterialColor,
   roughness, setRoughness,
-  metalness, setMetalness
+  metalness, setMetalness,
+  lightIntensity, setLightIntensity,
+  ambientIntensity, setAmbientIntensity
 }: SidebarProps) {
 
   return (
@@ -97,6 +101,30 @@ export default function Sidebar({
               <input 
                 type="range" min="-10" max="10" step="0.1" value={lightY} 
                 onChange={(e) => setLightY(Number(e.target.value))}
+                className="w-full h-[2px] bg-border rounded-none appearance-none cursor-pointer outline-none accent-accent"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <div className="flex justify-between items-center text-xs font-normal">
+                <span>Main Intensity</span>
+                <span className="text-accent bg-surface/50 px-2 py-0.5 rounded-sm border border-border font-mono">{lightIntensity.toFixed(1)}</span>
+              </div>
+              <input 
+                type="range" min="0" max="5" step="0.1" value={lightIntensity} 
+                onChange={(e) => setLightIntensity(Number(e.target.value))}
+                className="w-full h-[2px] bg-border rounded-none appearance-none cursor-pointer outline-none accent-accent"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <div className="flex justify-between items-center text-xs font-normal">
+                <span>Fill Light (Ambient)</span>
+                <span className="text-accent bg-surface/50 px-2 py-0.5 rounded-sm border border-border font-mono">{ambientIntensity.toFixed(1)}</span>
+              </div>
+              <input 
+                type="range" min="0" max="3" step="0.1" value={ambientIntensity} 
+                onChange={(e) => setAmbientIntensity(Number(e.target.value))}
                 className="w-full h-[2px] bg-border rounded-none appearance-none cursor-pointer outline-none accent-accent"
               />
             </div>
