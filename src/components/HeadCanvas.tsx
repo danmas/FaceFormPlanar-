@@ -358,7 +358,11 @@ function Scene({ pitch, yaw, lights, setLights, selectedLightId, setSelectedLigh
 
 export default function HeadCanvas(props: HeadCanvasProps) {
   return (
-    <Canvas shadows camera={{ position: [0, 1, 6], fov: 45 }} onPointerMissed={() => props.setSelectedLightId(null)}>
+    <Canvas 
+      shadows={{ type: THREE.PCFShadowMap }} 
+      camera={{ position: [0, 1, 6], fov: 45 }} 
+      onPointerMissed={() => props.setSelectedLightId(null)}
+    >
       <Scene {...props} />
     </Canvas>
   );
