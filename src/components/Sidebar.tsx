@@ -1,5 +1,5 @@
 import React from 'react';
-import { RefreshCw, Sun } from 'lucide-react';
+import { RefreshCw, Sun, Palette } from 'lucide-react';
 
 interface SidebarProps {
   pitch: number; setPitch: (v: number) => void;
@@ -11,6 +11,9 @@ interface SidebarProps {
   guides: boolean; setGuides: (v: boolean) => void;
   resetStage: () => void;
   handleFileUpload: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  materialColor: string; setMaterialColor: (v: string) => void;
+  roughness: number; setRoughness: (v: number) => void;
+  metalness: number; setMetalness: (v: number) => void;
 }
 
 export default function Sidebar({
@@ -22,7 +25,10 @@ export default function Sidebar({
   wireframe, setWireframe,
   guides, setGuides,
   resetStage,
-  handleFileUpload
+  handleFileUpload,
+  materialColor, setMaterialColor,
+  roughness, setRoughness,
+  metalness, setMetalness
 }: SidebarProps) {
 
   return (
@@ -91,6 +97,67 @@ export default function Sidebar({
               <input 
                 type="range" min="-10" max="10" step="0.1" value={lightY} 
                 onChange={(e) => setLightY(Number(e.target.value))}
+                className="w-full h-[2px] bg-border rounded-none appearance-none cursor-pointer outline-none accent-accent"
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Materials Group */}
+        <div className="space-y-6">
+          <div className="flex items-center gap-2 text-text-dim text-[11px] font-semibold tracking-[1.5px] uppercase">
+            <Palette size={14} />
+            <span>Material</span>
+          </div>
+
+          <div className="space-y-4">
+            {/* Color picker */}
+            <div className="space-y-2">
+              <div className="flex justify-between items-center text-xs font-normal">
+                <span>Base Color</span>
+              </div>
+              <div className="flex gap-2">
+                {['#1c1c1f', '#d0cbc3', '#8a8a8a', '#d4af37'].map(c => (
+                  <button 
+                    key={c}
+                    onClick={() => setMaterialColor(c)}
+                    className={`w-6 h-6 rounded-full border border-border p-0 cursor-pointer ${materialColor === c ? 'ring-2 ring-accent ring-offset-1 ring-offset-surface-dim' : ''}`}
+                    style={{ backgroundColor: c }}
+                  />
+                ))}
+                <div className="relative w-6 h-6 rounded-full border border-border overflow-hidden cursor-pointer">
+                  <input 
+                    type="color" 
+                    value={materialColor} 
+                    onChange={e => setMaterialColor(e.target.value)} 
+                    className="absolute w-[200%] h-[200%] -top-1/2 -left-1/2 p-0 border-0 cursor-pointer" 
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Roughness */}
+            <div className="space-y-2">
+              <div className="flex justify-between items-center text-xs font-normal">
+                <span>Roughness</span>
+                <span className="text-accent bg-surface/50 px-2 py-0.5 rounded-sm border border-border font-mono">{roughness.toFixed(2)}</span>
+              </div>
+              <input 
+                type="range" min="0" max="1" step="0.05" value={roughness} 
+                onChange={(e) => setRoughness(Number(e.target.value))}
+                className="w-full h-[2px] bg-border rounded-none appearance-none cursor-pointer outline-none accent-accent"
+              />
+            </div>
+
+            {/* Metalness */}
+            <div className="space-y-2">
+              <div className="flex justify-between items-center text-xs font-normal">
+                <span>Metalness</span>
+                <span className="text-accent bg-surface/50 px-2 py-0.5 rounded-sm border border-border font-mono">{metalness.toFixed(2)}</span>
+              </div>
+              <input 
+                type="range" min="0" max="1" step="0.05" value={metalness} 
+                onChange={(e) => setMetalness(Number(e.target.value))}
                 className="w-full h-[2px] bg-border rounded-none appearance-none cursor-pointer outline-none accent-accent"
               />
             </div>

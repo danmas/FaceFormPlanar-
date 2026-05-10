@@ -14,22 +14,25 @@ interface HeadCanvasProps {
   setPitch: (v: number) => void;
   setYaw: (v: number) => void;
   customModelUrl?: string | null;
+  materialColor: string;
+  roughness: number;
+  metalness: number;
 }
 
-function LowFidelityHead({ wireframe, guides }: { wireframe: boolean, guides: boolean }) {
-  const craniumMat = new THREE.MeshPhysicalMaterial({ 
-    color: wireframe ? '#d4af37' : '#2a2a2c',
-    metalness: 0.2,
-    roughness: 0.4,
+function LowFidelityHead({ wireframe, guides, color, roughness, metalness }: { wireframe: boolean, guides: boolean, color: string, roughness: number, metalness: number }) {
+  const craniumMat = new THREE.MeshStandardMaterial({ 
+    color: wireframe ? '#d4af37' : color,
+    metalness: metalness,
+    roughness: roughness,
     wireframe: wireframe,
     transparent: true,
     opacity: wireframe ? 0.4 : 1
   });
   
-  const jawMat = new THREE.MeshPhysicalMaterial({ 
-    color: wireframe ? '#d4af37' : '#1c1c1f',
-    metalness: 0.2,
-    roughness: 0.5,
+  const jawMat = new THREE.MeshStandardMaterial({ 
+    color: wireframe ? '#d4af37' : color,
+    metalness: metalness,
+    roughness: roughness,
     wireframe: wireframe,
     transparent: true,
     opacity: wireframe ? 0.4 : 1
@@ -107,11 +110,11 @@ function LowFidelityHead({ wireframe, guides }: { wireframe: boolean, guides: bo
 }
 
 // Mid Fidelity: Icosahedron simulating planar structures
-function MidFidelityHead({ wireframe, guides }: { wireframe: boolean, guides: boolean }) {
+function MidFidelityHead({ wireframe, guides, color, roughness, metalness }: { wireframe: boolean, guides: boolean, color: string, roughness: number, metalness: number }) {
   const material = new THREE.MeshStandardMaterial({ 
-    color: wireframe ? '#d4af37' : '#1c1c1f', 
-    roughness: 0.6,
-    metalness: 0.1,
+    color: wireframe ? '#d4af37' : color, 
+    roughness: roughness,
+    metalness: metalness,
     flatShading: true,
     wireframe: wireframe,
     transparent: true,
@@ -150,11 +153,11 @@ function MidFidelityHead({ wireframe, guides }: { wireframe: boolean, guides: bo
 }
 
 // Full Fidelity: Smoother denser geometry
-function FullFidelityHead({ wireframe, guides }: { wireframe: boolean, guides: boolean }) {
+function FullFidelityHead({ wireframe, guides, color, roughness, metalness }: { wireframe: boolean, guides: boolean, color: string, roughness: number, metalness: number }) {
   const material = new THREE.MeshStandardMaterial({ 
-    color: wireframe ? '#d4af37' : '#2a2a2c', 
-    roughness: 0.4,
-    metalness: 0.3,
+    color: wireframe ? '#d4af37' : color, 
+    roughness: roughness,
+    metalness: metalness,
     wireframe: wireframe,
     transparent: true,
     opacity: wireframe ? 0.3 : 1
@@ -190,15 +193,15 @@ function FullFidelityHead({ wireframe, guides }: { wireframe: boolean, guides: b
   );
 }
 
-function CustomModel({ url, wireframe }: { url: string, wireframe: boolean }) {
+function CustomModel({ url, wireframe, color, roughness, metalness }: { url: string, wireframe: boolean, color: string, roughness: number, metalness: number }) {
   const { scene } = useGLTF(url);
   
   // Override the original material with our dark theme clay material
   useEffect(() => {
     const themeMaterial = new THREE.MeshStandardMaterial({
-      color: wireframe ? '#d4af37' : '#1c1c1f',
-      roughness: 0.6,
-      metalness: 0.1,
+      color: wireframe ? '#d4af37' : color,
+      roughness: roughness,
+      metalness: metalness,
       wireframe: wireframe,
       transparent: true,
       opacity: wireframe ? 0.3 : 1,
@@ -210,12 +213,12 @@ function CustomModel({ url, wireframe }: { url: string, wireframe: boolean }) {
         child.material = themeMaterial;
       }
     });
-  }, [scene, wireframe]);
+  }, [scene, wireframe, color, roughness, metalness]);
 
   return <primitive object={scene} scale={[1.5, 1.5, 1.5]} position={[0, -0.5, 0]} />;
 }
 
-function Scene({ pitch, yaw, lightX, lightY, fidelity, wireframe, guides, customModelUrl, setPitch, setYaw }: HeadCanvasProps) {
+function Scene({ pitch, yaw, lightX, lightY, fidelity, wireframe, guides, customModelUrl, setPitch, setYaw, materialColor, roughness, metalness }: HeadCanvasProps) {
   const groupRef = useRef<THREE.Group>(null);
   const controlsRef = useRef<any>(null);
 
@@ -250,13 +253,13 @@ function Scene({ pitch, yaw, lightX, lightY, fidelity, wireframe, guides, custom
       <group ref={groupRef}>
         {customModelUrl ? (
           <Suspense fallback={null}>
-            <CustomModel url={customModelUrl} wireframe={wireframe} />
+            <CustomModel url={customModelUrl} wireframe={wireframe} color={materialColor} roughness={roughness} metalness={metalness} />
           </Suspense>
         ) : (
           <>
-            {fidelity === 'LOW' && <LowFidelityHead wireframe={wireframe} guides={guides} />}
-            {fidelity === 'MID' && <MidFidelityHead wireframe={wireframe} guides={guides} />}
-            {fidelity === 'FULL' && <FullFidelityHead wireframe={wireframe} guides={guides} />}
+            {fidelity === 'LOW' && <LowFidelityHead wireframe={wireframe} guides={guides} color={materialColor} roughness={roughness} metalness={metalness} />}
+            {fidelity === 'MID' && <MidFidelityHead wireframe={wireframe} guides={guides} color={materialColor} roughness={roughness} metalness={metalness} />}
+            {fidelity === 'FULL' && <FullFidelityHead wireframe={wireframe} guides={guides} color={materialColor} roughness={roughness} metalness={metalness} />}
           </>
         )}
       </group>

@@ -18,6 +18,9 @@ export default function App() {
   const [guides, setGuides] = useState(true);
   const [customModelUrl, setCustomModelUrl] = useState<string | null>(null);
   const [showInsight, setShowInsight] = useState(false);
+  const [materialColor, setMaterialColor] = useState('#1c1c1f');
+  const [roughness, setRoughness] = useState(0.6);
+  const [metalness, setMetalness] = useState(0.1);
 
   const resetStage = () => {
     setPitch(0);
@@ -29,6 +32,9 @@ export default function App() {
     setGuides(true);
     setCustomModelUrl(null);
     setShowInsight(false);
+    setMaterialColor('#1c1c1f');
+    setRoughness(0.6);
+    setMetalness(0.1);
   };
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -53,6 +59,9 @@ export default function App() {
         guides={guides} setGuides={setGuides}
         resetStage={resetStage}
         handleFileUpload={handleFileUpload}
+        materialColor={materialColor} setMaterialColor={setMaterialColor}
+        roughness={roughness} setRoughness={setRoughness}
+        metalness={metalness} setMetalness={setMetalness}
       />
 
       {/* Main Content Area */}
@@ -90,6 +99,9 @@ export default function App() {
              setPitch={setPitch}
              setYaw={setYaw}
              customModelUrl={customModelUrl}
+             materialColor={materialColor}
+             roughness={roughness}
+             metalness={metalness}
            />
         </div>
 
