@@ -23,6 +23,8 @@ export default function App() {
   const [metalness, setMetalness] = useState(0.1);
   const [lightIntensity, setLightIntensity] = useState(2);
   const [ambientIntensity, setAmbientIntensity] = useState(0.8);
+  const [showLights, setShowLights] = useState(true);
+  const [fixLightToCamera, setFixLightToCamera] = useState(false);
 
   const resetStage = () => {
     setPitch(0);
@@ -39,6 +41,8 @@ export default function App() {
     setMetalness(0.1);
     setLightIntensity(2);
     setAmbientIntensity(0.8);
+    setShowLights(true);
+    setFixLightToCamera(false);
   };
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -68,6 +72,8 @@ export default function App() {
         metalness={metalness} setMetalness={setMetalness}
         lightIntensity={lightIntensity} setLightIntensity={setLightIntensity}
         ambientIntensity={ambientIntensity} setAmbientIntensity={setAmbientIntensity}
+        showLights={showLights} setShowLights={setShowLights}
+        fixLightToCamera={fixLightToCamera} setFixLightToCamera={setFixLightToCamera}
       />
 
       {/* Main Content Area */}
@@ -110,6 +116,8 @@ export default function App() {
              metalness={metalness}
              lightIntensity={lightIntensity}
              ambientIntensity={ambientIntensity}
+             showLights={showLights}
+             fixLightToCamera={fixLightToCamera}
            />
         </div>
 

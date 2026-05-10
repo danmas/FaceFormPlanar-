@@ -19,6 +19,8 @@ interface HeadCanvasProps {
   metalness: number;
   lightIntensity: number;
   ambientIntensity: number;
+  showLights: boolean;
+  fixLightToCamera: boolean;
 }
 
 function LowFidelityHead({ wireframe, guides, color, roughness, metalness }: { wireframe: boolean, guides: boolean, color: string, roughness: number, metalness: number }) {
@@ -220,8 +222,9 @@ function CustomModel({ url, wireframe, color, roughness, metalness }: { url: str
   return <primitive object={scene} scale={[1.5, 1.5, 1.5]} position={[0, -0.5, 0]} />;
 }
 
-function Scene({ pitch, yaw, lightX, lightY, fidelity, wireframe, guides, customModelUrl, setPitch, setYaw, materialColor, roughness, metalness, lightIntensity, ambientIntensity }: HeadCanvasProps) {
+function Scene({ pitch, yaw, lightX, lightY, fidelity, wireframe, guides, customModelUrl, setPitch, setYaw, materialColor, roughness, metalness, lightIntensity, ambientIntensity, showLights, fixLightToCamera }: HeadCanvasProps) {
   const groupRef = useRef<THREE.Group>(null);
+  const lightsGroupRef = useRef<THREE.Group>(null);
   const controlsRef = useRef<any>(null);
 
   // Sync external state (sliders) to group rotation
@@ -233,6 +236,18 @@ function Scene({ pitch, yaw, lightX, lightY, fidelity, wireframe, guides, custom
     }
   }, [pitch, yaw]);
 
+  useFrame((state) => {
+    if (lightsGroupRef.current) {
+      if (fixLightToCamera) {
+        // Tie lights rotation to camera so they orbit relative to the screen
+        lightsGroupRef.current.quaternion.copy(state.camera.quaternion);
+      } else {
+        // Reset to world
+        lightsGroupRef.current.quaternion.identity();
+      }
+    }
+  });
+
   // Handle orbit controls updating sliders
   const handleControlChange = () => {
     // Left empty intentionally.
@@ -240,17 +255,36 @@ function Scene({ pitch, yaw, lightX, lightY, fidelity, wireframe, guides, custom
 
   return (
     <>
-      <ambientLight intensity={ambientIntensity} />
-      <directionalLight 
-        position={[lightX, lightY, 5]} 
-        intensity={lightIntensity} 
-        color="#ffffff"
-        castShadow 
-        shadow-mapSize-width={1024} 
-        shadow-mapSize-height={1024} 
-      />
-      <pointLight position={[-3, -2, -3]} color="#d4af37" intensity={1} />
-      <pointLight position={[3, 3, -3]} color="#808080" intensity={0.5} />
+      <group ref={lightsGroupRef}>
+        <ambientLight intensity={ambientIntensity} />
+        <directionalLight 
+          position={[lightX, lightY, 5]} 
+          intensity={lightIntensity} 
+          color="#ffffff"
+          castShadow 
+          shadow-mapSize-width={1024} 
+          shadow-mapSize-height={1024} 
+        />
+        <pointLight position={[-3, -2, -3]} color="#d4af37" intensity={1} />
+        <pointLight position={[3, 3, -3]} color="#808080" intensity={0.5} />
+        
+        {showLights && (
+          <>
+            <mesh position={[lightX, lightY, 5]}>
+              <sphereGeometry args={[0.2, 16, 16]} />
+              <meshBasicMaterial color="#ffffff" transparent opacity={0.9} />
+            </mesh>
+            <mesh position={[-3, -2, -3]}>
+              <sphereGeometry args={[0.15, 16, 16]} />
+              <meshBasicMaterial color="#d4af37" transparent opacity={0.8} />
+            </mesh>
+            <mesh position={[3, 3, -3]}>
+              <sphereGeometry args={[0.15, 16, 16]} />
+              <meshBasicMaterial color="#808080" transparent opacity={0.8} />
+            </mesh>
+          </>
+        )}
+      </group>
 
       <group ref={groupRef}>
         {customModelUrl ? (

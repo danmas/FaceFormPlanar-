@@ -16,6 +16,8 @@ interface SidebarProps {
   metalness: number; setMetalness: (v: number) => void;
   lightIntensity: number; setLightIntensity: (v: number) => void;
   ambientIntensity: number; setAmbientIntensity: (v: number) => void;
+  showLights: boolean; setShowLights: (v: boolean) => void;
+  fixLightToCamera: boolean; setFixLightToCamera: (v: boolean) => void;
 }
 
 export default function Sidebar({
@@ -32,7 +34,9 @@ export default function Sidebar({
   roughness, setRoughness,
   metalness, setMetalness,
   lightIntensity, setLightIntensity,
-  ambientIntensity, setAmbientIntensity
+  ambientIntensity, setAmbientIntensity,
+  showLights, setShowLights,
+  fixLightToCamera, setFixLightToCamera
 }: SidebarProps) {
 
   return (
@@ -160,6 +164,27 @@ export default function Sidebar({
                 onChange={(e) => setAmbientIntensity(Number(e.target.value))}
                 className="w-full h-[2px] bg-border rounded-none appearance-none cursor-pointer outline-none accent-accent"
               />
+            </div>
+
+            {/* Light Option Toggles */}
+            <div className="flex justify-between items-center pt-2">
+               <span className="uppercase tracking-[1.5px] text-text-dim text-[11px]">Show Lights</span>
+               <button 
+                 onClick={() => setShowLights(!showLights)}
+                 className={`w-[40px] h-5 rounded-full p-0.5 transition-colors duration-200 ease-in-out relative ${showLights ? 'bg-accent' : 'bg-surface border border-border'}`}
+               >
+                  <div className={`w-4 h-4 bg-white rounded-full transition-transform duration-200 ease-in-out absolute top-[1px] ${showLights ? 'translate-x-5' : 'translate-x-0'}`} />
+               </button>
+            </div>
+
+            <div className="flex justify-between items-center pt-2">
+               <span className="uppercase tracking-[1.5px] text-text-dim text-[11px]">Lock to Camera</span>
+               <button 
+                 onClick={() => setFixLightToCamera(!fixLightToCamera)}
+                 className={`w-[40px] h-5 rounded-full p-0.5 transition-colors duration-200 ease-in-out relative ${fixLightToCamera ? 'bg-accent' : 'bg-surface border border-border'}`}
+               >
+                  <div className={`w-4 h-4 bg-white rounded-full transition-transform duration-200 ease-in-out absolute top-[1px] ${fixLightToCamera ? 'translate-x-5' : 'translate-x-0'}`} />
+               </button>
             </div>
           </div>
         </div>
