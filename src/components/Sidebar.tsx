@@ -81,6 +81,39 @@ export default function Sidebar({
           </div>
 
           <div className="space-y-4">
+            {/* Presets */}
+            <div className="space-y-2">
+              <div className="flex justify-between items-center text-xs font-normal">
+                <span>Presets</span>
+              </div>
+              <div className="grid grid-cols-3 gap-2">
+                <button 
+                  onClick={() => { setLightX(0); setLightY(0); }}
+                  className="py-1.5 bg-surface border border-border text-[9px] text-text hover:text-accent hover:border-accent rounded-sm transition-colors text-center uppercase tracking-widest"
+                >Front</button>
+                <button 
+                  onClick={() => { setLightX(0); setLightY(5); }}
+                  className="py-1.5 bg-surface border border-border text-[9px] text-text hover:text-accent hover:border-accent rounded-sm transition-colors text-center uppercase tracking-widest"
+                >Top</button>
+                <button 
+                  onClick={() => { setLightX(-4); setLightY(4); }}
+                  className="py-1.5 bg-surface border border-border text-[9px] text-text hover:text-accent hover:border-accent rounded-sm transition-colors text-center uppercase tracking-widest"
+                >Rembrandt</button>
+                <button 
+                  onClick={() => { setLightX(-5); setLightY(0); }}
+                  className="py-1.5 bg-surface border border-border text-[9px] text-text hover:text-accent hover:border-accent rounded-sm transition-colors text-center uppercase tracking-widest"
+                >Side L</button>
+                <button 
+                  onClick={() => { setLightX(5); setLightY(0); }}
+                  className="py-1.5 bg-surface border border-border text-[9px] text-text hover:text-accent hover:border-accent rounded-sm transition-colors text-center uppercase tracking-widest"
+                >Side R</button>
+                <button 
+                  onClick={() => { setLightX(0); setLightY(-5); }}
+                  className="py-1.5 bg-surface border border-border text-[9px] text-text hover:text-accent hover:border-accent rounded-sm transition-colors text-center uppercase tracking-widest"
+                >Under</button>
+              </div>
+            </div>
+
             <div className="space-y-2">
               <div className="flex justify-between items-center text-xs font-normal">
                 <span>Horizontal Pos</span>
