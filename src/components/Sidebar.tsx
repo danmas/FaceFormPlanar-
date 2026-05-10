@@ -4,8 +4,8 @@ import { RefreshCw, Sun, Palette } from 'lucide-react';
 interface SidebarProps {
   pitch: number; setPitch: (v: number) => void;
   yaw: number; setYaw: (v: number) => void;
-  lightX: number; setLightX: (v: number) => void;
-  lightY: number; setLightY: (v: number) => void;
+  lightAzimuth: number; setLightAzimuth: (v: number) => void;
+  lightElevation: number; setLightElevation: (v: number) => void;
   fidelity: 'LOW' | 'MID' | 'FULL'; setFidelity: (v: 'LOW' | 'MID' | 'FULL') => void;
   wireframe: boolean; setWireframe: (v: boolean) => void;
   guides: boolean; setGuides: (v: boolean) => void;
@@ -23,8 +23,8 @@ interface SidebarProps {
 export default function Sidebar({
   pitch, setPitch,
   yaw, setYaw,
-  lightX, setLightX,
-  lightY, setLightY,
+  lightAzimuth, setLightAzimuth,
+  lightElevation, setLightElevation,
   fidelity, setFidelity,
   wireframe, setWireframe,
   guides, setGuides,
@@ -92,27 +92,27 @@ export default function Sidebar({
               </div>
               <div className="grid grid-cols-3 gap-2">
                 <button 
-                  onClick={() => { setLightX(0); setLightY(0); }}
+                  onClick={() => { setLightAzimuth(0); setLightElevation(0); }}
                   className="py-1.5 bg-surface border border-border text-[9px] text-text hover:text-accent hover:border-accent rounded-sm transition-colors text-center uppercase tracking-widest"
                 >Front</button>
                 <button 
-                  onClick={() => { setLightX(0); setLightY(5); }}
+                  onClick={() => { setLightAzimuth(0); setLightElevation(60); }}
                   className="py-1.5 bg-surface border border-border text-[9px] text-text hover:text-accent hover:border-accent rounded-sm transition-colors text-center uppercase tracking-widest"
                 >Top</button>
                 <button 
-                  onClick={() => { setLightX(-4); setLightY(4); }}
+                  onClick={() => { setLightAzimuth(45); setLightElevation(30); }}
                   className="py-1.5 bg-surface border border-border text-[9px] text-text hover:text-accent hover:border-accent rounded-sm transition-colors text-center uppercase tracking-widest"
                 >Rembrandt</button>
                 <button 
-                  onClick={() => { setLightX(-5); setLightY(0); }}
+                  onClick={() => { setLightAzimuth(-90); setLightElevation(10); }}
                   className="py-1.5 bg-surface border border-border text-[9px] text-text hover:text-accent hover:border-accent rounded-sm transition-colors text-center uppercase tracking-widest"
                 >Side L</button>
                 <button 
-                  onClick={() => { setLightX(5); setLightY(0); }}
+                  onClick={() => { setLightAzimuth(90); setLightElevation(10); }}
                   className="py-1.5 bg-surface border border-border text-[9px] text-text hover:text-accent hover:border-accent rounded-sm transition-colors text-center uppercase tracking-widest"
                 >Side R</button>
                 <button 
-                  onClick={() => { setLightX(0); setLightY(-5); }}
+                  onClick={() => { setLightAzimuth(0); setLightElevation(-45); }}
                   className="py-1.5 bg-surface border border-border text-[9px] text-text hover:text-accent hover:border-accent rounded-sm transition-colors text-center uppercase tracking-widest"
                 >Under</button>
               </div>
@@ -120,24 +120,24 @@ export default function Sidebar({
 
             <div className="space-y-2">
               <div className="flex justify-between items-center text-xs font-normal">
-                <span>Horizontal Pos</span>
-                <span className="text-accent bg-surface/50 px-2 py-0.5 rounded-sm border border-border font-mono">{lightX.toFixed(1)}</span>
+                <span>Azimuth (Y)</span>
+                <span className="text-accent bg-surface/50 px-2 py-0.5 rounded-sm border border-border font-mono">{lightAzimuth}°</span>
               </div>
               <input 
-                type="range" min="-10" max="10" step="0.1" value={lightX} 
-                onChange={(e) => setLightX(Number(e.target.value))}
+                type="range" min="-180" max="180" step="1" value={lightAzimuth} 
+                onChange={(e) => setLightAzimuth(Number(e.target.value))}
                 className="w-full h-[2px] bg-border rounded-none appearance-none cursor-pointer outline-none accent-accent"
               />
             </div>
 
             <div className="space-y-2">
               <div className="flex justify-between items-center text-xs font-normal">
-                <span>Vertical Pos</span>
-                <span className="text-accent bg-surface/50 px-2 py-0.5 rounded-sm border border-border font-mono">{lightY.toFixed(1)}</span>
+                <span>Elevation (X)</span>
+                <span className="text-accent bg-surface/50 px-2 py-0.5 rounded-sm border border-border font-mono">{lightElevation}°</span>
               </div>
               <input 
-                type="range" min="-10" max="10" step="0.1" value={lightY} 
-                onChange={(e) => setLightY(Number(e.target.value))}
+                type="range" min="-90" max="90" step="1" value={lightElevation} 
+                onChange={(e) => setLightElevation(Number(e.target.value))}
                 className="w-full h-[2px] bg-border rounded-none appearance-none cursor-pointer outline-none accent-accent"
               />
             </div>

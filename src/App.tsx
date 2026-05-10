@@ -11,8 +11,8 @@ import { RotateCw, Sparkles, HelpCircle } from 'lucide-react';
 export default function App() {
   const [pitch, setPitch] = useState(0);
   const [yaw, setYaw] = useState(0);
-  const [lightX, setLightX] = useState(-1.5);
-  const [lightY, setLightY] = useState(2);
+  const [lightAzimuth, setLightAzimuth] = useState(45);
+  const [lightElevation, setLightElevation] = useState(30);
   const [fidelity, setFidelity] = useState<'LOW' | 'MID' | 'FULL'>('LOW');
   const [wireframe, setWireframe] = useState(false);
   const [guides, setGuides] = useState(true);
@@ -24,13 +24,13 @@ export default function App() {
   const [lightIntensity, setLightIntensity] = useState(2);
   const [ambientIntensity, setAmbientIntensity] = useState(0.8);
   const [showLights, setShowLights] = useState(true);
-  const [fixLightToCamera, setFixLightToCamera] = useState(false);
+  const [fixLightToCamera, setFixLightToCamera] = useState(true);
 
   const resetStage = () => {
     setPitch(0);
     setYaw(0);
-    setLightX(-1.5);
-    setLightY(2);
+    setLightAzimuth(45);
+    setLightElevation(30);
     setFidelity('LOW');
     setWireframe(false);
     setGuides(true);
@@ -42,7 +42,7 @@ export default function App() {
     setLightIntensity(2);
     setAmbientIntensity(0.8);
     setShowLights(true);
-    setFixLightToCamera(false);
+    setFixLightToCamera(true);
   };
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -60,8 +60,8 @@ export default function App() {
       <Sidebar 
         pitch={pitch} setPitch={setPitch}
         yaw={yaw} setYaw={setYaw}
-        lightX={lightX} setLightX={setLightX}
-        lightY={lightY} setLightY={setLightY}
+        lightAzimuth={lightAzimuth} setLightAzimuth={setLightAzimuth}
+        lightElevation={lightElevation} setLightElevation={setLightElevation}
         fidelity={fidelity} setFidelity={setFidelity}
         wireframe={wireframe} setWireframe={setWireframe}
         guides={guides} setGuides={setGuides}
@@ -104,7 +104,7 @@ export default function App() {
         <div className="absolute inset-0 z-0 bg-[radial-gradient(circle_at_center,_#1c1c1f_0%,_#0a0a0a_100%)]">
            <HeadCanvas 
              pitch={pitch} yaw={yaw}
-             lightX={lightX} lightY={lightY}
+             lightAzimuth={lightAzimuth} lightElevation={lightElevation}
              fidelity={fidelity}
              wireframe={wireframe}
              guides={guides}

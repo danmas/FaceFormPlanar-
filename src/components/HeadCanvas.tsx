@@ -6,8 +6,8 @@ import * as THREE from 'three';
 interface HeadCanvasProps {
   pitch: number;
   yaw: number;
-  lightX: number;
-  lightY: number;
+  lightAzimuth: number;
+  lightElevation: number;
   fidelity: 'LOW' | 'MID' | 'FULL';
   wireframe: boolean;
   guides: boolean;
@@ -222,10 +222,18 @@ function CustomModel({ url, wireframe, color, roughness, metalness }: { url: str
   return <primitive object={scene} scale={[1.5, 1.5, 1.5]} position={[0, -0.5, 0]} />;
 }
 
-function Scene({ pitch, yaw, lightX, lightY, fidelity, wireframe, guides, customModelUrl, setPitch, setYaw, materialColor, roughness, metalness, lightIntensity, ambientIntensity, showLights, fixLightToCamera }: HeadCanvasProps) {
+function Scene({ pitch, yaw, lightAzimuth, lightElevation, fidelity, wireframe, guides, customModelUrl, setPitch, setYaw, materialColor, roughness, metalness, lightIntensity, ambientIntensity, showLights, fixLightToCamera }: HeadCanvasProps) {
   const groupRef = useRef<THREE.Group>(null);
   const lightsGroupRef = useRef<THREE.Group>(null);
   const controlsRef = useRef<any>(null);
+
+  // Convert Azimuth and Elevation to Cartesian
+  const radius = 5;
+  const phi = THREE.MathUtils.degToRad(lightElevation);
+  const theta = THREE.MathUtils.degToRad(lightAzimuth);
+  const lx = radius * Math.cos(phi) * Math.sin(theta);
+  const ly = radius * Math.sin(phi);
+  const lz = radius * Math.cos(phi) * Math.cos(theta);
 
   // Sync external state (sliders) to group rotation
   useEffect(() => {
@@ -258,7 +266,7 @@ function Scene({ pitch, yaw, lightX, lightY, fidelity, wireframe, guides, custom
       <group ref={lightsGroupRef}>
         <ambientLight intensity={ambientIntensity} />
         <directionalLight 
-          position={[lightX, lightY, 5]} 
+          position={[lx, ly, lz]} 
           intensity={lightIntensity} 
           color="#ffffff"
           castShadow 
@@ -270,7 +278,7 @@ function Scene({ pitch, yaw, lightX, lightY, fidelity, wireframe, guides, custom
         
         {showLights && (
           <>
-            <mesh position={[lightX, lightY, 5]}>
+            <mesh position={[lx, ly, lz]}>
               <sphereGeometry args={[0.2, 16, 16]} />
               <meshBasicMaterial color="#ffffff" transparent opacity={0.9} />
             </mesh>
@@ -310,7 +318,6 @@ function Scene({ pitch, yaw, lightX, lightY, fidelity, wireframe, guides, custom
         minDistance={3}
         maxDistance={10}
       />
-      <Environment preset="studio" />
     </>
   );
 }
