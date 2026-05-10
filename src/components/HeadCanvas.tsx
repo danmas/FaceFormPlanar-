@@ -310,6 +310,19 @@ function Scene({ pitch, yaw, lights, setLights, selectedLightId, setSelectedLigh
                   )}
                 </mesh>
               )}
+              
+              {showLights && isSelected && (
+                <>
+                  <mesh rotation={[Math.PI / 2, 0, 0]} position={[0, ly, 0]}>
+                    <torusGeometry args={[Math.max(0.01, radius * Math.cos(phi)), 0.015, 8, 64]} />
+                    <meshBasicMaterial color={light.color} transparent opacity={0.4} />
+                  </mesh>
+                  <mesh rotation={[0, theta + Math.PI / 2, 0]}>
+                    <torusGeometry args={[radius, 0.015, 8, 64]} />
+                    <meshBasicMaterial color={light.color} transparent opacity={0.4} />
+                  </mesh>
+                </>
+              )}
             </group>
           );
         })}

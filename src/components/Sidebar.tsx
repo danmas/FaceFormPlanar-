@@ -136,19 +136,17 @@ export default function Sidebar({
                   />
                 </div>
                 
-                {selectedLight.type === 'point' && (
-                  <div className="space-y-2">
-                    <div className="flex justify-between items-center text-xs font-normal">
-                      <span>Distance</span>
-                      <span className="text-accent bg-bg/50 px-2 py-0.5 rounded-sm border border-border font-mono">{selectedLight.distance.toFixed(1)}</span>
-                    </div>
-                    <input 
-                      type="range" min="1" max="15" step="0.1" value={selectedLight.distance} 
-                      onChange={(e) => updateLight(selectedLight.id, { distance: Number(e.target.value) })}
-                      className="w-full h-[2px] bg-border rounded-none appearance-none cursor-pointer outline-none accent-accent"
-                    />
+                <div className="space-y-2">
+                  <div className="flex justify-between items-center text-xs font-normal">
+                    <span>Distance</span>
+                    <span className="text-accent bg-bg/50 px-2 py-0.5 rounded-sm border border-border font-mono">{selectedLight.distance.toFixed(1)}</span>
                   </div>
-                )}
+                  <input 
+                    type="range" min="1" max="15" step="0.1" value={selectedLight.distance} 
+                    onChange={(e) => updateLight(selectedLight.id, { distance: Number(e.target.value) })}
+                    className="w-full h-[2px] bg-border rounded-none appearance-none cursor-pointer outline-none accent-accent"
+                  />
+                </div>
                 
                 <div className="space-y-2">
                   <div className="flex justify-between items-center text-xs font-normal">
