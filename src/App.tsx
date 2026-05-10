@@ -94,9 +94,9 @@ export default function App() {
         </div>
 
         {/* Bottom Overlay Tooltip */}
-        <div className="absolute bottom-12 z-10 pointer-events-auto">
-          <div className="bg-bg shadow-[0_0_20px_rgba(0,0,0,0.5)] rounded-sm border border-border p-6 min-w-[320px] text-center flex flex-col gap-4">
-            <p className="text-[11px] font-semibold tracking-[1.5px] uppercase text-text-dim">Study the planes of the head</p>
+        <div className="absolute bottom-8 left-8 z-10 pointer-events-auto">
+          <div className="bg-bg shadow-[0_0_20px_rgba(0,0,0,0.5)] rounded-sm border border-border p-6 w-[280px] flex flex-col gap-4">
+            <p className="text-[11px] font-semibold tracking-[1.5px] uppercase text-text-dim text-center">Study the planes</p>
             <button 
               onClick={() => setShowInsight(true)}
               className="w-full py-3 bg-surface border border-border hover:bg-accent hover:text-bg text-text text-xs uppercase font-mono tracking-wider transition-colors rounded-sm shadow-md"

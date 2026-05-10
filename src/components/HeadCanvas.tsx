@@ -193,13 +193,21 @@ function FullFidelityHead({ wireframe, guides }: { wireframe: boolean, guides: b
 function CustomModel({ url, wireframe }: { url: string, wireframe: boolean }) {
   const { scene } = useGLTF(url);
   
-  // Apply wireframe to all meshes if needed
+  // Override the original material with our dark theme clay material
   useEffect(() => {
+    const themeMaterial = new THREE.MeshStandardMaterial({
+      color: wireframe ? '#d4af37' : '#1c1c1f',
+      roughness: 0.6,
+      metalness: 0.1,
+      wireframe: wireframe,
+      transparent: true,
+      opacity: wireframe ? 0.3 : 1,
+      flatShading: true,
+    });
+
     scene.traverse((child) => {
       if (child instanceof THREE.Mesh) {
-        if (child.material) {
-          child.material.wireframe = wireframe;
-        }
+        child.material = themeMaterial;
       }
     });
   }, [scene, wireframe]);
