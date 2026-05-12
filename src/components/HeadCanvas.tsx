@@ -333,19 +333,21 @@ function Scene({ pitch, yaw, lights, setLights, selectedLightId, setSelectedLigh
         })}
       </group>
 
-      <group ref={groupRef} scale={modelScale} position={[modelOffsetX, modelOffsetY, modelOffsetZ]}>
+      <group ref={groupRef} scale={modelScale}>
         {showAxes && <axesHelper args={[5]} />}
-        {customModelUrl ? (
-          <Suspense fallback={null}>
-            <CustomModel url={customModelUrl} wireframe={wireframe} color={materialColor} roughness={roughness} metalness={metalness} />
-          </Suspense>
-        ) : (
-          <>
-            {fidelity === 'LOW' && <LowFidelityHead wireframe={wireframe} guides={guides} color={materialColor} roughness={roughness} metalness={metalness} />}
-            {fidelity === 'MID' && <MidFidelityHead wireframe={wireframe} guides={guides} color={materialColor} roughness={roughness} metalness={metalness} />}
-            {fidelity === 'FULL' && <FullFidelityHead wireframe={wireframe} guides={guides} color={materialColor} roughness={roughness} metalness={metalness} />}
-          </>
-        )}
+        <group position={[modelOffsetX, modelOffsetY, modelOffsetZ]}>
+          {customModelUrl ? (
+            <Suspense fallback={null}>
+              <CustomModel url={customModelUrl} wireframe={wireframe} color={materialColor} roughness={roughness} metalness={metalness} />
+            </Suspense>
+          ) : (
+            <>
+              {fidelity === 'LOW' && <LowFidelityHead wireframe={wireframe} guides={guides} color={materialColor} roughness={roughness} metalness={metalness} />}
+              {fidelity === 'MID' && <MidFidelityHead wireframe={wireframe} guides={guides} color={materialColor} roughness={roughness} metalness={metalness} />}
+              {fidelity === 'FULL' && <FullFidelityHead wireframe={wireframe} guides={guides} color={materialColor} roughness={roughness} metalness={metalness} />}
+            </>
+          )}
+        </group>
       </group>
 
       <ContactShadows position={[0, -1.2, 0]} opacity={0.6} scale={10} blur={2} far={4} />
