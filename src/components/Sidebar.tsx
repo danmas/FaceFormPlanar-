@@ -5,6 +5,10 @@ import { LightState, LightType } from '../types';
 interface SidebarProps {
   pitch: number; setPitch: (v: number) => void;
   yaw: number; setYaw: (v: number) => void;
+  modelScale: number; setModelScale: (v: number) => void;
+  modelOffsetX: number; setModelOffsetX: (v: number) => void;
+  modelOffsetY: number; setModelOffsetY: (v: number) => void;
+  modelOffsetZ: number; setModelOffsetZ: (v: number) => void;
   lights: LightState[]; setLights: (v: LightState[]) => void;
   selectedLightId: string | null; setSelectedLightId: (v: string | null) => void;
   fidelity: 'LOW' | 'MID' | 'FULL'; setFidelity: (v: 'LOW' | 'MID' | 'FULL') => void;
@@ -17,12 +21,17 @@ interface SidebarProps {
   metalness: number; setMetalness: (v: number) => void;
   ambientIntensity: number; setAmbientIntensity: (v: number) => void;
   showLights: boolean; setShowLights: (v: boolean) => void;
+  showAxes: boolean; setShowAxes: (v: boolean) => void;
   fixLightToCamera: boolean; setFixLightToCamera: (v: boolean) => void;
 }
 
 export default function Sidebar({
   pitch, setPitch,
   yaw, setYaw,
+  modelScale, setModelScale,
+  modelOffsetX, setModelOffsetX,
+  modelOffsetY, setModelOffsetY,
+  modelOffsetZ, setModelOffsetZ,
   lights, setLights,
   selectedLightId, setSelectedLightId,
   fidelity, setFidelity,
@@ -35,6 +44,7 @@ export default function Sidebar({
   metalness, setMetalness,
   ambientIntensity, setAmbientIntensity,
   showLights, setShowLights,
+  showAxes, setShowAxes,
   fixLightToCamera, setFixLightToCamera
 }: SidebarProps) {
   
@@ -76,6 +86,74 @@ export default function Sidebar({
               <input 
                 type="range" min="-180" max="180" value={yaw} 
                 onChange={(e) => setYaw(Number(e.target.value))}
+                className="w-full h-[2px] bg-border rounded-none appearance-none cursor-pointer outline-none accent-accent"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <div className="flex justify-between items-center text-xs font-normal">
+                <span>Model Scale</span>
+                <input 
+                  type="number" 
+                  value={modelScale}
+                  onChange={(e) => setModelScale(Number(e.target.value))}
+                  className="w-16 bg-surface/50 text-accent px-1 py-0.5 rounded-sm border border-border font-mono text-right outline-none"
+                />
+              </div>
+              <input 
+                type="range" min="0.01" max="100" step="0.01" value={modelScale} 
+                onChange={(e) => setModelScale(Number(e.target.value))}
+                className="w-full h-[2px] bg-border rounded-none appearance-none cursor-pointer outline-none accent-accent"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <div className="flex justify-between items-center text-xs font-normal">
+                <span>Offset X</span>
+                <input 
+                  type="number" 
+                  value={modelOffsetX}
+                  onChange={(e) => setModelOffsetX(Number(e.target.value))}
+                  className="w-16 bg-surface/50 text-accent px-1 py-0.5 rounded-sm border border-border font-mono text-right outline-none"
+                />
+              </div>
+              <input 
+                type="range" min="-10" max="10" step="0.01" value={modelOffsetX} 
+                onChange={(e) => setModelOffsetX(Number(e.target.value))}
+                className="w-full h-[2px] bg-border rounded-none appearance-none cursor-pointer outline-none accent-accent"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <div className="flex justify-between items-center text-xs font-normal">
+                <span>Offset Y</span>
+                <input 
+                  type="number" 
+                  value={modelOffsetY}
+                  onChange={(e) => setModelOffsetY(Number(e.target.value))}
+                  className="w-16 bg-surface/50 text-accent px-1 py-0.5 rounded-sm border border-border font-mono text-right outline-none"
+                />
+              </div>
+              <input 
+                type="range" min="-10" max="10" step="0.01" value={modelOffsetY} 
+                onChange={(e) => setModelOffsetY(Number(e.target.value))}
+                className="w-full h-[2px] bg-border rounded-none appearance-none cursor-pointer outline-none accent-accent"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <div className="flex justify-between items-center text-xs font-normal">
+                <span>Offset Z</span>
+                <input 
+                  type="number" 
+                  value={modelOffsetZ}
+                  onChange={(e) => setModelOffsetZ(Number(e.target.value))}
+                  className="w-16 bg-surface/50 text-accent px-1 py-0.5 rounded-sm border border-border font-mono text-right outline-none"
+                />
+              </div>
+              <input 
+                type="range" min="-10" max="10" step="0.01" value={modelOffsetZ} 
+                onChange={(e) => setModelOffsetZ(Number(e.target.value))}
                 className="w-full h-[2px] bg-border rounded-none appearance-none cursor-pointer outline-none accent-accent"
               />
             </div>
@@ -240,6 +318,16 @@ export default function Sidebar({
                  className={`w-[40px] h-5 rounded-full p-0.5 transition-colors duration-200 ease-in-out relative ${showLights ? 'bg-accent' : 'bg-surface border border-border'}`}
                >
                   <div className={`w-4 h-4 bg-white rounded-full transition-transform duration-200 ease-in-out absolute top-[1px] ${showLights ? 'translate-x-5' : 'translate-x-0'}`} />
+               </button>
+            </div>
+
+            <div className="flex justify-between items-center pt-2">
+               <span className="uppercase tracking-[1.5px] text-text-dim text-[11px]">Show Axes</span>
+               <button 
+                 onClick={() => setShowAxes(!showAxes)}
+                 className={`w-[40px] h-5 rounded-full p-0.5 transition-colors duration-200 ease-in-out relative ${showAxes ? 'bg-accent' : 'bg-surface border border-border'}`}
+               >
+                  <div className={`w-4 h-4 bg-white rounded-full transition-transform duration-200 ease-in-out absolute top-[1px] ${showAxes ? 'translate-x-5' : 'translate-x-0'}`} />
                </button>
             </div>
 

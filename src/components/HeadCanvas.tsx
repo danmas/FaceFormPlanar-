@@ -23,7 +23,12 @@ interface HeadCanvasProps {
   metalness: number;
   ambientIntensity: number;
   showLights: boolean;
+  showAxes: boolean;
   fixLightToCamera: boolean;
+  modelScale: number;
+  modelOffsetX: number;
+  modelOffsetY: number;
+  modelOffsetZ: number;
 }
 
 function LowFidelityHead({ wireframe, guides, color, roughness, metalness }: { wireframe: boolean, guides: boolean, color: string, roughness: number, metalness: number }) {
@@ -225,7 +230,7 @@ function CustomModel({ url, wireframe, color, roughness, metalness }: { url: str
   return <primitive object={scene} scale={[1.5, 1.5, 1.5]} position={[0, -0.5, 0]} />;
 }
 
-function Scene({ pitch, yaw, lights, setLights, selectedLightId, setSelectedLightId, fidelity, wireframe, guides, customModelUrl, setPitch, setYaw, materialColor, roughness, metalness, ambientIntensity, showLights, fixLightToCamera }: HeadCanvasProps) {
+function Scene({ pitch, yaw, lights, setLights, selectedLightId, setSelectedLightId, fidelity, wireframe, guides, customModelUrl, setPitch, setYaw, materialColor, roughness, metalness, ambientIntensity, showLights, showAxes, fixLightToCamera, modelScale, modelOffsetX, modelOffsetY, modelOffsetZ }: HeadCanvasProps) {
   const groupRef = useRef<THREE.Group>(null);
   const lightsGroupRef = useRef<THREE.Group>(null);
   const controlsRef = useRef<any>(null);
@@ -328,7 +333,8 @@ function Scene({ pitch, yaw, lights, setLights, selectedLightId, setSelectedLigh
         })}
       </group>
 
-      <group ref={groupRef}>
+      <group ref={groupRef} scale={modelScale} position={[modelOffsetX, modelOffsetY, modelOffsetZ]}>
+        {showAxes && <axesHelper args={[5]} />}
         {customModelUrl ? (
           <Suspense fallback={null}>
             <CustomModel url={customModelUrl} wireframe={wireframe} color={materialColor} roughness={roughness} metalness={metalness} />

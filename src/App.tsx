@@ -10,6 +10,10 @@ import { RotateCw, Sparkles, HelpCircle } from 'lucide-react';
 import { LightState } from './types';
 
 export default function App() {
+  const [modelScale, setModelScale] = useState(1);
+  const [modelOffsetX, setModelOffsetX] = useState(0);
+  const [modelOffsetY, setModelOffsetY] = useState(0);
+  const [modelOffsetZ, setModelOffsetZ] = useState(0);
   const [pitch, setPitch] = useState(0);
   const [yaw, setYaw] = useState(0);
   const [lights, setLights] = useState<LightState[]>([
@@ -29,8 +33,13 @@ export default function App() {
   const [ambientIntensity, setAmbientIntensity] = useState(0.8);
   const [showLights, setShowLights] = useState(true);
   const [fixLightToCamera, setFixLightToCamera] = useState(true);
+  const [showAxes, setShowAxes] = useState(false);
 
   const resetStage = () => {
+    setModelScale(1);
+    setModelOffsetX(0);
+    setModelOffsetY(0);
+    setModelOffsetZ(0);
     setPitch(0);
     setYaw(0);
     setLights([
@@ -50,6 +59,7 @@ export default function App() {
     setAmbientIntensity(0.8);
     setShowLights(true);
     setFixLightToCamera(true);
+    setShowAxes(false);
   };
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -65,6 +75,10 @@ export default function App() {
     <div className="flex h-screen w-full bg-bg text-text font-sans overflow-hidden">
       {/* Sidebar Controls */}
       <Sidebar 
+        modelScale={modelScale} setModelScale={setModelScale}
+        modelOffsetX={modelOffsetX} setModelOffsetX={setModelOffsetX}
+        modelOffsetY={modelOffsetY} setModelOffsetY={setModelOffsetY}
+        modelOffsetZ={modelOffsetZ} setModelOffsetZ={setModelOffsetZ}
         pitch={pitch} setPitch={setPitch}
         yaw={yaw} setYaw={setYaw}
         lights={lights} setLights={setLights}
@@ -79,6 +93,7 @@ export default function App() {
         metalness={metalness} setMetalness={setMetalness}
         ambientIntensity={ambientIntensity} setAmbientIntensity={setAmbientIntensity}
         showLights={showLights} setShowLights={setShowLights}
+        showAxes={showAxes} setShowAxes={setShowAxes}
         fixLightToCamera={fixLightToCamera} setFixLightToCamera={setFixLightToCamera}
       />
 
@@ -109,6 +124,10 @@ export default function App() {
         {/* 3D Canvas */}
         <div className="absolute inset-0 z-0 bg-[radial-gradient(circle_at_center,_#1c1c1f_0%,_#0a0a0a_100%)]">
            <HeadCanvas 
+             modelScale={modelScale}
+             modelOffsetX={modelOffsetX}
+             modelOffsetY={modelOffsetY}
+             modelOffsetZ={modelOffsetZ}
              pitch={pitch} yaw={yaw}
              lights={lights} setLights={setLights}
              selectedLightId={selectedLightId} setSelectedLightId={setSelectedLightId}
@@ -123,6 +142,7 @@ export default function App() {
              metalness={metalness}
              ambientIntensity={ambientIntensity}
              showLights={showLights}
+             showAxes={showAxes}
              fixLightToCamera={fixLightToCamera}
            />
         </div>
