@@ -16,6 +16,8 @@ interface SidebarProps {
   guides: boolean; setGuides: (v: boolean) => void;
   resetStage: () => void;
   handleFileUpload: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  handleSaveShift: () => void;
+  uploadedFileName: string | null;
   materialColor: string; setMaterialColor: (v: string) => void;
   roughness: number; setRoughness: (v: number) => void;
   metalness: number; setMetalness: (v: number) => void;
@@ -39,6 +41,8 @@ export default function Sidebar({
   guides, setGuides,
   resetStage,
   handleFileUpload,
+  handleSaveShift,
+  uploadedFileName,
   materialColor, setMaterialColor,
   roughness, setRoughness,
   metalness, setMetalness,
@@ -156,6 +160,17 @@ export default function Sidebar({
                 onChange={(e) => setModelOffsetZ(Number(e.target.value))}
                 className="w-full h-[2px] bg-border rounded-none appearance-none cursor-pointer outline-none accent-accent"
               />
+            </div>
+            
+            <div className="pt-2">
+              <button 
+                onClick={handleSaveShift}
+                disabled={!uploadedFileName}
+                className={`w-full py-2 border rounded-sm text-xs transition-colors flex items-center justify-center gap-2 uppercase tracking-wide ${uploadedFileName ? 'bg-surface border-border text-accent hover:bg-hover active:bg-active' : 'bg-surface/50 border-border/50 text-text-dim cursor-not-allowed'}`}
+                title={!uploadedFileName ? "Upload a model first to save its settings" : ""}
+              >
+                Save shift model
+              </button>
             </div>
           </div>
         </div>
@@ -449,8 +464,8 @@ export default function Sidebar({
 
             {/* Custom Model Upload */}
             <div className="pt-6">
-              <label className="flex items-center justify-center w-full py-2.5 bg-transparent border border-border hover:bg-surface text-text text-[11px] uppercase tracking-[1px] cursor-pointer rounded-sm transition-colors">
-                <span>Upload Custom .glb</span>
+              <label className="flex items-center justify-center w-full py-2.5 bg-transparent border border-border hover:bg-surface text-text text-[11px] uppercase tracking-[1px] cursor-pointer rounded-sm text-center px-2 truncate transition-colors">
+                <span className="truncate">{uploadedFileName || 'Upload Custom .glb'}</span>
                 <input type="file" accept=".glb,.gltf" className="hidden" onChange={handleFileUpload} />
               </label>
             </div>

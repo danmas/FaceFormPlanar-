@@ -34,6 +34,7 @@ export default function App() {
   const [showLights, setShowLights] = useState(true);
   const [fixLightToCamera, setFixLightToCamera] = useState(true);
   const [showAxes, setShowAxes] = useState(false);
+  const [uploadedFileName, setUploadedFileName] = useState<string | null>(null);
 
   const resetStage = () => {
     setModelScale(1);
@@ -52,6 +53,7 @@ export default function App() {
     setWireframe(false);
     setGuides(true);
     setCustomModelUrl(null);
+    setUploadedFileName(null);
     setShowInsight(false);
     setMaterialColor('#1c1c1f');
     setRoughness(0.6);
@@ -62,12 +64,58 @@ export default function App() {
     setShowAxes(false);
   };
 
-  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
       const url = URL.createObjectURL(file);
       setCustomModelUrl(url);
+      setUploadedFileName(file.name);
       setFidelity('FULL'); // Switch to full to see the model
+      
+      try {
+        const res = await fetch('/api/settings');
+        if (res.ok) {
+          const allSettings = await res.json();
+          if (allSettings[file.name]) {
+            const s = allSettings[file.name];
+            if (s.scale !== undefined) setModelScale(s.scale);
+            if (s.offsetX !== undefined) setModelOffsetX(s.offsetX);
+            if (s.offsetY !== undefined) setModelOffsetY(s.offsetY);
+            if (s.offsetZ !== undefined) setModelOffsetZ(s.offsetZ);
+          } else {
+            // Reset to defaults if no settings
+            setModelScale(1);
+            setModelOffsetX(0);
+            setModelOffsetY(0);
+            setModelOffsetZ(0);
+          }
+        }
+      } catch (err) {
+        console.error('Failed to load settings', err);
+      }
+    }
+  };
+
+  const handleSaveShift = async () => {
+    if (!uploadedFileName) return;
+    try {
+      await fetch('/api/settings', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          fileName: uploadedFileName,
+          settings: {
+            scale: modelScale,
+            offsetX: modelOffsetX,
+            offsetY: modelOffsetY,
+            offsetZ: modelOffsetZ
+          }
+        })
+      });
+      alert('Settings saved successfully!');
+    } catch (err) {
+      console.error(err);
+      alert('Failed to save settings');
     }
   };
 
@@ -88,6 +136,8 @@ export default function App() {
         guides={guides} setGuides={setGuides}
         resetStage={resetStage}
         handleFileUpload={handleFileUpload}
+        handleSaveShift={handleSaveShift}
+        uploadedFileName={uploadedFileName}
         materialColor={materialColor} setMaterialColor={setMaterialColor}
         roughness={roughness} setRoughness={setRoughness}
         metalness={metalness} setMetalness={setMetalness}
