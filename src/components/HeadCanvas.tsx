@@ -234,6 +234,10 @@ function Scene({ pitch, yaw, lights, setLights, selectedLightId, setSelectedLigh
   const groupRef = useRef<THREE.Group>(null);
   const lightsGroupRef = useRef<THREE.Group>(null);
   const controlsRef = useRef<any>(null);
+  const isShiftHeld = useRef(false);
+  const isPanning = useRef(false);
+  const lastPointer = useRef({ x: 0, y: 0 });
+  const { camera, gl } = useThree();
 
   // Sync external state (sliders) to group rotation
   useEffect(() => {
@@ -260,6 +264,103 @@ function Scene({ pitch, yaw, lights, setLights, selectedLightId, setSelectedLigh
   const handleControlChange = () => {
     // Left empty intentionally.
   };
+
+  // Track Shift key state (ref-only, no re-renders)
+  useEffect(() => {
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Shift' && !e.repeat) isShiftHeld.current = true;
+    };
+    const onKeyUp = (e: KeyboardEvent) => {
+      if (e.key === 'Shift') {
+        isShiftHeld.current = false;
+        if (isPanning.current) {
+          isPanning.current = false;
+          if (controlsRef.current) controlsRef.current.enableRotate = true;
+        }
+      }
+    };
+    const onBlur = () => {
+      isShiftHeld.current = false;
+      if (isPanning.current) {
+        isPanning.current = false;
+        if (controlsRef.current) controlsRef.current.enableRotate = true;
+      }
+    };
+    window.addEventListener('keydown', onKeyDown);
+    window.addEventListener('keyup', onKeyUp);
+    window.addEventListener('blur', onBlur);
+    return () => {
+      window.removeEventListener('keydown', onKeyDown);
+      window.removeEventListener('keyup', onKeyUp);
+      window.removeEventListener('blur', onBlur);
+    };
+  }, []);
+
+  // Custom Shift+LMB screen-space panning
+  // Uses capture-phase pointerdown to intercept before OrbitControls,
+  // then moves the camera target directly in camera-local right/up directions.
+  useEffect(() => {
+    const domElement = gl.domElement;
+
+    const onPointerDown = (e: PointerEvent) => {
+      if (e.button === 0 && isShiftHeld.current && controlsRef.current) {
+        isPanning.current = true;
+        lastPointer.current = { x: e.clientX, y: e.clientY };
+        controlsRef.current.enableRotate = false;
+        e.stopPropagation();
+      }
+    };
+
+    const onPointerMove = (e: PointerEvent) => {
+      if (!isPanning.current || !controlsRef.current) return;
+
+      const dx = e.clientX - lastPointer.current.x;
+      const dy = e.clientY - lastPointer.current.y;
+      lastPointer.current = { x: e.clientX, y: e.clientY };
+      if (dx === 0 && dy === 0) return;
+
+      const target = controlsRef.current.target;
+      const dist = camera.position.distanceTo(target);
+      const perspCam = camera as THREE.PerspectiveCamera;
+      const fovRad = THREE.MathUtils.degToRad(perspCam.fov);
+      const pxPerWorld = (2 * dist * Math.tan(fovRad / 2)) / domElement.clientHeight;
+
+      // Camera-local right and up vectors for screen-space movement
+      const camDir = new THREE.Vector3();
+      camera.getWorldDirection(camDir);
+      const camRight = new THREE.Vector3()
+        .crossVectors(camera.up, camDir)
+        .normalize();
+      const camUp = new THREE.Vector3()
+        .crossVectors(camDir, camRight)
+        .normalize();
+
+      // Drag right  → target moves left  (model appears to move right)
+      // Drag up     → target moves down (model appears to move up)
+      const delta = camRight.multiplyScalar(-dx * pxPerWorld)
+        .add(camUp.multiplyScalar(dy * pxPerWorld));
+
+      target.add(delta);
+    };
+
+    const onPointerUp = () => {
+      if (isPanning.current) {
+        isPanning.current = false;
+        if (controlsRef.current) controlsRef.current.enableRotate = true;
+      }
+    };
+
+    // Capture phase ensures we grab the event before OrbitControls does
+    domElement.addEventListener('pointerdown', onPointerDown, true);
+    domElement.addEventListener('pointermove', onPointerMove);
+    window.addEventListener('pointerup', onPointerUp);
+
+    return () => {
+      domElement.removeEventListener('pointerdown', onPointerDown, true);
+      domElement.removeEventListener('pointermove', onPointerMove);
+      window.removeEventListener('pointerup', onPointerUp);
+    };
+  }, [camera, gl]);
 
   return (
     <>
@@ -355,7 +456,8 @@ function Scene({ pitch, yaw, lights, setLights, selectedLightId, setSelectedLigh
       <OrbitControls 
         ref={controlsRef}
         onChange={handleControlChange}
-        enablePan={false}
+        enablePan={true}
+        screenSpacePanning={true}
         enableZoom={true}
         minDistance={3}
         maxDistance={20}
