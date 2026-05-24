@@ -2,15 +2,11 @@ import "dotenv/config";
 import express from "express";
 import path from "path";
 import fs from "fs";
-import { fileURLToPath } from "url";
 import { createServer as createViteServer } from "vite";
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
 
 async function startServer() {
   const app = express();
-  const PORT = process.env.PORT || 3502;
+  const PORT = Number(process.env.PORT) || 3502;
 
   app.use(express.json());
 

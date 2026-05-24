@@ -339,7 +339,7 @@ function Scene({ pitch, yaw, lights, setLights, selectedLightId, setSelectedLigh
 
       // Drag right  → target moves right (model appears to move left on screen)
       // Drag up     → target moves down  (model appears to move up on screen)
-      const delta = camRight.multiplyScalar(-dx * pxPerWorld)
+      const delta = camRight.multiplyScalar(dx * pxPerWorld)
         .add(camUp.multiplyScalar(dy * pxPerWorld));
 
       target.add(delta);
