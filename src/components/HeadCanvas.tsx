@@ -265,26 +265,26 @@ function Scene({ pitch, yaw, lights, setLights, selectedLightId, setSelectedLigh
     // Left empty intentionally.
   };
 
-  // Track Shift key state (ref-only, no re-renders)
+  // Track Shift key state — disable OrbitControls rotation immediately
+  // so that even if the event leaks through, OrbitControls won't rotate.
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Shift' && !e.repeat) isShiftHeld.current = true;
+      if (e.key === 'Shift' && !e.repeat) {
+        isShiftHeld.current = true;
+        if (controlsRef.current) controlsRef.current.enableRotate = false;
+      }
     };
     const onKeyUp = (e: KeyboardEvent) => {
       if (e.key === 'Shift') {
         isShiftHeld.current = false;
-        if (isPanning.current) {
-          isPanning.current = false;
-          if (controlsRef.current) controlsRef.current.enableRotate = true;
-        }
+        if (controlsRef.current) controlsRef.current.enableRotate = true;
+        if (isPanning.current) isPanning.current = false;
       }
     };
     const onBlur = () => {
       isShiftHeld.current = false;
-      if (isPanning.current) {
-        isPanning.current = false;
-        if (controlsRef.current) controlsRef.current.enableRotate = true;
-      }
+      if (controlsRef.current) controlsRef.current.enableRotate = true;
+      if (isPanning.current) isPanning.current = false;
     };
     window.addEventListener('keydown', onKeyDown);
     window.addEventListener('keyup', onKeyUp);
@@ -293,6 +293,8 @@ function Scene({ pitch, yaw, lights, setLights, selectedLightId, setSelectedLigh
       window.removeEventListener('keydown', onKeyDown);
       window.removeEventListener('keyup', onKeyUp);
       window.removeEventListener('blur', onBlur);
+      // Safety: re-enable rotation on unmount
+      if (controlsRef.current) controlsRef.current.enableRotate = true;
     };
   }, []);
 
@@ -335,8 +337,8 @@ function Scene({ pitch, yaw, lights, setLights, selectedLightId, setSelectedLigh
         .crossVectors(camDir, camRight)
         .normalize();
 
-      // Drag right  → target moves left  (model appears to move right)
-      // Drag up     → target moves down (model appears to move up)
+      // Drag right  → target moves right (model appears to move left on screen)
+      // Drag up     → target moves down  (model appears to move up on screen)
       const delta = camRight.multiplyScalar(-dx * pxPerWorld)
         .add(camUp.multiplyScalar(dy * pxPerWorld));
 
